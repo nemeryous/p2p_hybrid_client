@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,29 +18,43 @@ import java.util.logging.Logger;
  *
  * @author NAM
  */
-public class Server implements Runnable{
+public class Server implements Runnable {
+
     ServerSocket serverSocket;
-    ArrayList<ServerSocketController> controllers;
+    Set<ServerSocketController> allPeerConnected;
+
     public Server(int port) {
-        controllers = new ArrayList<>();
+        allPeerConnected = new HashSet<>();
         try {
             serverSocket = new ServerSocket(port);
-                    } catch (IOException ex) {
+        } catch (IOException ex) {
             Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     @Override
     public void run() {
-        while (true) {            
+        while (true) {
             try {
                 Socket socket = serverSocket.accept();
-                ServerSocketController controller = new ServerSocketController(socket);
-                controllers.add(controller);
+                System.out.println("New peer's connected: " + socket.getInetAddress().getHostAddress());
+                ServerSocketController newPeerConnected = new ServerSocketController(socket);
+                Thread thread = new Thread(newPeerConnected);
+                thread.start();
+                allPeerConnected.add(newPeerConnected);
+                System.out.println(allPeerConnected.size());
             } catch (IOException ex) {
                 Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+
     }
+
+    public List<ServerSocketController> getServerSocketController() {
+        if (!allPeerConnected.isEmpty()) {
+            return  new ArrayList<>(allPeerConnected);
+        }
+        return null;
+    }
+
 }

@@ -15,11 +15,12 @@ import java.util.logging.Logger;
  *
  * @author NAM
  */
-public class Peer implements Runnable{
+public class Peer implements Runnable {
+
     Socket peerSocket;
     DataInputStream dis;
     DataOutputStream dos;
-    
+
     public Peer(Socket peerSocket) {
         try {
             this.peerSocket = peerSocket;
@@ -32,7 +33,14 @@ public class Peer implements Runnable{
 
     @Override
     public void run() {
-        
+        try {
+
+            dos.writeUTF("Hello World");
+            dos.flush();
+//            System.out.println("Test send message to another peers");
+        } catch (Exception ex) {
+            Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
+        }
         while (true) {
             try {
                 String message = dis.readUTF();
@@ -41,6 +49,6 @@ public class Peer implements Runnable{
                 Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+
     }
 }

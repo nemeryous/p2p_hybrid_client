@@ -29,7 +29,7 @@ public class ServerSocketController implements Runnable{
 
     @Override
     public void run() {
-        while (connectedSocket.isConnected()) {
+        while (true) {
             String message;
             try {
                 message = dis.readUTF();
