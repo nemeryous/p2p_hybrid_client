@@ -21,6 +21,7 @@ import java.util.logging.Logger;
  * @author NAM
  */
 public class Client implements Runnable {
+
     Socket clientSocket;
     DataInputStream dis;
     DataOutputStream dos;
@@ -28,7 +29,6 @@ public class Client implements Runnable {
     String name;
     List<Integer> allServerPorts;
     List<Peer> peers;
-    
 
     public Client() {
         peers = new ArrayList<>();
@@ -49,41 +49,39 @@ public class Client implements Runnable {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
         while (true) {
-            
-            
+
             try {
                 String messageFromServer;
                 messageFromServer = dis.readUTF();
-//                System.out.println(messageFromServer);
                 switch (messageFromServer) {
                     case "own_server_port":
+                        
                         createOwnServer();
                         break;
+                        
                     case "all_server_ports":
+                        
                         getAllServerPorts();
                         break;
+                    case "new_peer":
                         
-////                    case "your_name":
-////                        name = dis.readUTF();
-////                        System.out.println(name);
-////                        break;
-
+                        int newPeerPort = Integer.parseInt(dis.readUTF());
+                        createNewPeer(newPeerPort);
                         
-////                    case "your_name":
-////                        name = dis.readUTF();
-////                        System.out.println(name);
-////                        break;
-                  
+                        break;
+                    default:
+                        System.out.println(messageFromServer);
+                        break;
                 }
             } catch (IOException ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
                 break;
             }
-            
+
         }
-        
+
     }
-    
+
     public void sendMessage(String message) throws IOException {
         dos.writeUTF(message);
         dos.flush();
@@ -91,36 +89,47 @@ public class Client implements Runnable {
 
     public void createOwnServer() throws IOException {
         int ownServerPort = Integer.parseInt(dis.readUTF());
-        System.out.println(ownServerPort);
         ownServer = new Server(ownServerPort);
         Thread thread = new Thread(ownServer);
         thread.start();
-        System.out.println(thread);
+        sendMessage("create_server_successful");
     }
-    
+
+    public void createNewPeer(Integer newPeerPort) {
+        try {
+            Socket newSocket = new Socket("localhost", newPeerPort);
+            System.out.println("Connecting to peer with port: " + newPeerPort);
+            Peer newPeer = new Peer(newSocket);
+            Thread thread = new Thread(newPeer);
+            thread.start();
+            peers.add(newPeer);
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public void getAllServerPorts() {
         try {
             ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
             this.allServerPorts = (ArrayList<Integer>) objectInputStream.readObject();
-            
-//            objectInputStream.close();
-//            System.out.println(allServerPorts);
+
         } catch (Exception ex) {
             System.out.println(ex);
             System.out.println("Error in getAllServerPorts method");
         }
         for (Integer i : allServerPorts) {
             try {
-                System.out.println("abc");
-                Socket newSocket = new Socket("localhost", i);
-                Peer newPeer = new Peer(newSocket);
-                peers.add(newPeer);
-                Thread thread = new Thread(newPeer);
-                thread.start();
-            } catch (IOException ex) {
+                createNewPeer(i);
+//                Socket newSocket = new Socket("localhost", i);
+//                Peer newPeer = new Peer(newSocket);
+//                System.out.println("Connecting to peer with port: " + i);
+//                peers.add(newPeer);
+//                Thread thread = new Thread(newPeer);
+//                thread.start();
+            } catch (Exception ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("Error in getAllServerPorts method: " + ex);
             }
-            }
-        
+        }
     }
 }

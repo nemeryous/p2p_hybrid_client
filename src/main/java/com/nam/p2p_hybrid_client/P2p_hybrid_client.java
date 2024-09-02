@@ -16,61 +16,51 @@ import java.util.logging.Logger;
  */
 public class P2p_hybrid_client {
 
+    public static Client client = new Client();
+
     public static void main(String[] args) throws Exception {
         ServerSocketController testChat = null;
-        Client client = new Client();
         Thread thread = new Thread(client);
         thread.start();
-        System.out.println("After thread start");
 
         while (true) {
-            System.out.println("Enter your choice");
-            Scanner sc = new Scanner(System.in);
-            String choice = sc.nextLine();
-            switch (choice) {
-                case "chat_with":
-                    System.out.println("Enter your chat");
-//                    if (client.ownServer.getServerSocketController() != null) {
-//                       String chat = sc.nextLine();
-//                       
-//                    }
-                    String chat = sc.nextLine();
-                    chatAll(chat, client);
-                    break;
+            try {
+
+                System.out.println("Enter your choice");
+                Scanner sc = new Scanner(System.in);
+                String choice = sc.nextLine();
+                switch (choice) {
+                    case "chat_with":
+                        System.out.println("Enter your chat");
+
+                        String chat = sc.nextLine();
+                        chatAll(chat, client);
+                        break;
+                    case "show_all_peer_port":
+                        showAllPeerPort();
+                        break;
+
+                }
+            } catch (Exception e) {
             }
         }
 
-//        if (testChat != null) {
-//            System.out.println("Now test chat isn't null");
-//
-//            while (true) {
-//                try {
-//                    Scanner sc = new Scanner(System.in);
-//                    System.out.println("Enter your chat");
-//                    String messageToServer = sc.nextLine();
-//
-//                    if (messageToServer.equals("quit")) {
-//                        break;
-//                    }
-//                    testChat.sendMessage(messageToServer);
-////                if(messageToServer.equals("quit")) break;
-////                client.sendMessage(messageToServer);
-//
-//                } catch (Exception ex) {
-//                    Logger.getLogger(P2p_hybrid_client.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-//            }
-//        }
     }
 
-    public static void chatAll(String message, Client client) throws Exception{
+    public static void chatAll(String message, Client client) throws Exception {
+        List<ServerSocketController> allPeersConnected = client.ownServer.getServerSocketController();
         try {
-            List<ServerSocketController> allPeersConnected = client.ownServer.getServerSocketController();
-
             for (ServerSocketController peer : allPeersConnected) {
                 peer.sendMessage(message);
-            } 
+            }
         } catch (Exception e) {
+        }
+    }
+
+    private static void showAllPeerPort() {
+        List<ServerSocketController> allPeersConnected = client.ownServer.getServerSocketController();
+        for (ServerSocketController peer : allPeersConnected) {
+            System.out.println("Peer's port: " + peer.getConnectedSocket().getLocalPort());
         }
     }
 

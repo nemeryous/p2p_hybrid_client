@@ -45,6 +45,40 @@ public class ServerSocketController implements Runnable{
         dos.writeUTF(message);
         dos.flush();
     }
+
+    public Socket getConnectedSocket() {
+        return connectedSocket;
+    }
+
+    public void setConnectedSocket(Socket connectedSocket) {
+        this.connectedSocket = connectedSocket;
+    }
+
+    public DataInputStream getDis() {
+        return dis;
+    }
+
+    public void setDis(DataInputStream dis) {
+        this.dis = dis;
+    }
+
+    public DataOutputStream getDos() {
+        return dos;
+    }
+
+    public void setDos(DataOutputStream dos) {
+        this.dos = dos;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    
     
     
 }

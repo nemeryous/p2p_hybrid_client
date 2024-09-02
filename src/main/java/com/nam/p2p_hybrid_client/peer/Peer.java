@@ -33,14 +33,6 @@ public class Peer implements Runnable {
 
     @Override
     public void run() {
-        try {
-
-            dos.writeUTF("Hello World");
-            dos.flush();
-//            System.out.println("Test send message to another peers");
-        } catch (Exception ex) {
-            Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
-        }
         while (true) {
             try {
                 String message = dis.readUTF();
@@ -51,4 +43,30 @@ public class Peer implements Runnable {
         }
 
     }
+
+    public Socket getPeerSocket() {
+        return peerSocket;
+    }
+
+    public void setPeerSocket(Socket peerSocket) {
+        this.peerSocket = peerSocket;
+    }
+
+    public DataInputStream getDis() {
+        return dis;
+    }
+
+    public void setDis(DataInputStream dis) {
+        this.dis = dis;
+    }
+
+    public DataOutputStream getDos() {
+        return dos;
+    }
+
+    public void setDos(DataOutputStream dos) {
+        this.dos = dos;
+    }
+    
+    
 }

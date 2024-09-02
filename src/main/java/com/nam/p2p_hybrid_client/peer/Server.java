@@ -22,11 +22,14 @@ public class Server implements Runnable {
 
     ServerSocket serverSocket;
     Set<ServerSocketController> allPeerConnected;
+    Integer port;
 
     public Server(int port) {
         allPeerConnected = new HashSet<>();
+        this.port = port;
         try {
             serverSocket = new ServerSocket(port);
+            System.out.println("Open server at port: " + serverSocket.getLocalPort());
         } catch (IOException ex) {
             Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -39,10 +42,9 @@ public class Server implements Runnable {
                 Socket socket = serverSocket.accept();
                 System.out.println("New peer's connected: " + socket.getInetAddress().getHostAddress());
                 ServerSocketController newPeerConnected = new ServerSocketController(socket);
+                allPeerConnected.add(newPeerConnected);
                 Thread thread = new Thread(newPeerConnected);
                 thread.start();
-                allPeerConnected.add(newPeerConnected);
-                System.out.println(allPeerConnected.size());
             } catch (IOException ex) {
                 Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
             }
