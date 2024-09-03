@@ -13,6 +13,7 @@ import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,11 +44,11 @@ public class Client implements Runnable {
 
     @Override
     public void run() {
-        try {
-            sendMessage("Hello Server");
-        } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        try {
+//            createClientName();
+//        } catch (Exception ex) {
+//            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+//        }
         while (true) {
 
             try {
@@ -80,6 +81,19 @@ public class Client implements Runnable {
 
         }
 
+    }
+    
+    public void createClientName() {
+        try {
+            System.out.print("Enter your name: ");
+            Scanner sc = new Scanner(System.in);
+            String clientName = sc.nextLine();
+            this.name = clientName;
+            sendMessage("new_user");
+            sendMessage(clientName);
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void sendMessage(String message) throws IOException {
@@ -120,16 +134,20 @@ public class Client implements Runnable {
         for (Integer i : allServerPorts) {
             try {
                 createNewPeer(i);
-//                Socket newSocket = new Socket("localhost", i);
-//                Peer newPeer = new Peer(newSocket);
-//                System.out.println("Connecting to peer with port: " + i);
-//                peers.add(newPeer);
-//                Thread thread = new Thread(newPeer);
-//                thread.start();
             } catch (Exception ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
                 System.out.println("Error in getAllServerPorts method: " + ex);
             }
         }
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+     
 }
